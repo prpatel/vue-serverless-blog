@@ -1,0 +1,22 @@
+{
+  "name": "blog-backend-serverless-js",
+  "version": "1.0.0",
+  "description": "blog-backend-serverless-js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/prpatel/blog-backend-serverless-js.git"
+  },
+  "author": "prpatel",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/prpatel/blog-backend-serverless-js/issues"
+  },
+  "homepage": "https://github.com/prpatel/blog-backend-serverless-js#readme",
+  "dependencies": {
+    "@cloudant/cloudant": "^4.0.0"
+  }
+}
