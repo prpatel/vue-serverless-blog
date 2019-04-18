@@ -4,7 +4,7 @@
   "description": "blog-backend-serverless-js",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./node_modules/mocha/bin/mocha"
   },
   "repository": {
     "type": "git",
@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/prpatel/blog-backend-serverless-js#readme",
   "dependencies": {
-    "@cloudant/cloudant": "^4.0.0"
+    "@cloudant/cloudant": "^4.0.0",
+    "kuuid": "^0.4.0",
+    "mocha": "^6.1.3"
   }
 }
