@@ -20,8 +20,7 @@ let cloudant = new Cloudant({
 });
 
 describe('cloudant database functions', function() {
-    let count = 1;
-
+    // return;
     let baseDocument = {
         author: 'prpatel',
         title: 'TEST TITLE savePost',
@@ -58,14 +57,11 @@ describe('cloudant database functions', function() {
             let result = savePost(params, testDBName);
             await result;
             result.then(data => {
-                console.log('savePost:', data)
-                // assert.equal(data.rows, 2, "Limit param not working");
+                assert.equal(data.body.ok, true, "savePost succeeded");
             } )
 
         });
     });
 });
 
-
-{"author":"prpatel","title":"TEST WEB TITLE savePost”,"image":"https://upload.wikimedia.org/wikipedia/commons/5/54/WOWAKK-Kukai-Alaskan-Klee-Kai.jpg","tags":"test3,test4","published":true,"body":”TEST  WEB savePost TEST header\n============"}'
 

@@ -20,8 +20,11 @@ let cloudant = new Cloudant({
 });
 
 describe('cloudant database functions', function() {
-
     return;
+    let existingDocumentId;
+    let existingDocumentRev;
+
+    // return;
     let count = 1;
     let baseDocument = {
         _id: new Date().getTime()+'',
@@ -34,25 +37,31 @@ describe('cloudant database functions', function() {
     }
 
 
-    before(function(done) {
-        let createDB = new Promise(function(resolve, reject) {
-            cloudant.db.list(testDBName).then((listDBs)=> {
-                    if (!listDBs.includes(testDBName)) {
-                        cloudant.db.create(testDBName).then(() => {
-                            cloudant.use(testDBName).insert(baseDocument).then((data) => {
-                                resolve(data);
-                                done();
-                            });
-                        }).catch((err) => {
-                            console.log(err);
-                        })
-                    } else {
-                        resolve("db exists");
+    // for this test, create a document to destroy in the test
+    before(function (done) {
+        cloudant.db.list(testDBName).then((listDBs) => {
+                if (!listDBs.includes(testDBName)) {
+                    cloudant.db.create(testDBName).then(() => {
+                        cloudant.use(testDBName).insert(baseDocument).then((data) => {
+                            console.log("data", data)
+                            existingDocumentId=data.id;
+                            existingDocumentRev=data.rev;
+                            done();
+                        });
+                    }).catch((err) => {
+                        console.log(err);
+                    })
+                } else {
+                    console.log("db exists");
+                    cloudant.use(testDBName).insert(baseDocument).then((data) => {
+                        console.log("data", data)
+                        existingDocumentId=data.id;
+                        existingDocumentRev=data.rev;
                         done();
-                    }
+                    });
                 }
-            )
-        });
+            }
+        )
     });
 
     describe('getPosts', function() {
@@ -61,7 +70,19 @@ describe('cloudant database functions', function() {
             let result = getPosts(params, testDBName);
             await result;
             result.then(data => {
-                assert.equal(data.rows.length, 2, "Limit param not working");
+                assert.equal(data.body.rows.length, 2, "Limit param not working");
+            } )
+
+        });
+    });
+
+    describe('get ONE post', function() {
+        it('should return 1 post', async function(){
+            params._id = existingDocumentId;
+            let result = getPosts(params, testDBName);
+            await result;
+            result.then(data => {
+                assert.equal(data.body._id, existingDocumentId, "not able to fetch exactly one post by id");
             } )
 
         });

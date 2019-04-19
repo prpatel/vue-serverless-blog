@@ -15,30 +15,80 @@ function main(params, dbname) {
 
     let limit = params.limit;
     let skip = params.skip;
+    let id = params._id;
+    let cloudant = new Cloudant({
+        account: params.__bx_creds.cloudantNoSQLDB.username,
+        password: params.__bx_creds.cloudantNoSQLDB.password,
+        plugins: 'promises'
+    });
+    let db = cloudant.db.use(dbname ? dbname: DBNAME);
 
-    return new Promise(function (resolve, reject) {
-        try {
-            let cloudant = new Cloudant({
-                account: params.__bx_creds.cloudantNoSQLDB.username,
-                password: params.__bx_creds.cloudantNoSQLDB.password,
-                plugins: 'promises'
-            });
-            let db = cloudant.db.use(dbname ? dbname: DBNAME);
+    // if id is included that means we getting one Post, else several of them
+    if (!id) {
+        return new Promise(function (resolve, reject) {
+            try {
+                db.list({descending: true, include_docs:true, limit: limit, skip: skip}, function(err, result) {
+                    if (err) {
+                        reject({
+                            statusCode: 500,
+                            headers: {'Content-Type': 'application/json'},
+                            body: {
+                                error: error
+                            }
+                        })
+                    } else {
+                        resolve({
+                            headers: {'Content-Type': 'application/json'},
+                            statusCode: 200,
+                            body: result
+                        });
+                    }
+                    // console.log('result: %s', JSON.stringify(result, null, 4));
+                });
+            } catch (error) {
+                reject({
+                    statusCode: 500,
+                    headers: {'Content-Type': 'application/json'},
+                    body: {
+                        error: error
+                    }
+                })
+            }
+        })
+    } else {
+        return new Promise(function (resolve, reject) {
+            try {
+                db.get(id, function(err, result) {
+                    if (err) {
+                        reject({
+                            statusCode: 500,
+                            headers: {'Content-Type': 'application/json'},
+                            body: {
+                                error: error
+                            }
+                        })
+                    } else {
+                        resolve({
+                            headers: {'Content-Type': 'application/json'},
+                            statusCode: 200,
+                            body: result
+                        });
+                    }
+                    // console.log('result: %s', JSON.stringify(result, null, 4));
+                });
+            } catch (error) {
+                reject({
+                    statusCode: 500,
+                    headers: {'Content-Type': 'application/json'},
+                    body: {
+                        error: error
+                    }
+                })
+            }
+        })
+    }
 
-            db.list({descending: true, include_docs:true, limit: limit, skip: skip}, function(err, result) {
-                if (err) {
-                    reject({error: err})
-                } else {
-                    resolve(result);
-                }
-                // console.log('result: %s', JSON.stringify(result, null, 4));
-            });
 
-
-        } catch (error) {
-            reject({error: error})
-        }
-    })
 }
 
 module.exports = main;

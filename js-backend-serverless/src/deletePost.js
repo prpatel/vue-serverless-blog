@@ -13,17 +13,23 @@ function main(params, dbname) {
         }
     }
 
-    let document = {
-        _id: new Date().getTime()+' ',
-        author: params.author,
-        title: params.title,
-        image: params.image,
-        tags: params.tags,
-        published: params.published,
-        body: params.body
+    let id = params._id;
+    let rev = params._rev;
+    if (!id || !rev) {
+        console.log('Error occurred: no "id" and/or "rev" specified deletePost()');
+        return new Promise(function (resolve, reject) {
+            reject({
+                statusCode: 400,
+                headers: {'Content-Type': 'application/json'},
+                body: {
+                    error: "_id and _rev params are required"
+                }
+            })
+        })
     }
 
     return new Promise(function (resolve, reject) {
+        console.log("DELETEING POST")
         try {
             let cloudant = new Cloudant({
                 account: params.__bx_creds.cloudantNoSQLDB.username,
@@ -31,7 +37,7 @@ function main(params, dbname) {
                 plugins: 'promises'
             });
             let db = cloudant.db.use(dbname ? dbname: DBNAME);
-            db.insert(document).then((result) => {
+            db.destroy(id, rev).then((result) => {
                     resolve({
                         headers: {'Content-Type': 'application/json'},
                         statusCode: 200,
